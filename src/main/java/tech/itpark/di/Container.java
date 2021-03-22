@@ -63,6 +63,7 @@ public class Container {
     }
 
     private Object createInstance(Constructor<?> constructor) {
+        boolean isAccess = constructor.canAccess(null);
         try {
             constructor.setAccessible(true);
             Object[] params = getParamsValue(constructor);
@@ -71,7 +72,7 @@ public class Container {
             e.printStackTrace();
             throw new ObjectInstantiationException(e);
         } finally {
-            if (!constructor.canAccess(null)) {
+            if (!isAccess) {
                 constructor.setAccessible(false);
             }
         }
