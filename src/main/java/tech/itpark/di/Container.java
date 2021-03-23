@@ -6,6 +6,7 @@ import tech.itpark.di.exception.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Container {
@@ -51,14 +52,14 @@ public class Container {
                 .map(o -> o.getDeclaredConstructors()[0])
                 .filter(o -> firstIterator ? (o.getParameterCount() == 0 || allParameterInValues(o)) : allParameterInValues(o))
                 .map(this::createInstance)
-                .collect(Collectors.toMap(Object::getClass, o -> o));
+                .collect(Collectors.toMap(Object::getClass, Function.identity()));
 
         objects.putAll(generation);
         declarationInterfaces(generation);
         currentDefinitions.removeAll(generation.keySet());
 
         if (generation.size() == 0) {
-            checkOnUnmet(currentDefinitions);
+            throwUnmetException(currentDefinitions);
         }
     }
 
@@ -78,7 +79,7 @@ public class Container {
         }
     }
 
-    private void checkOnUnmet(Set<Class<?>> currentDefinitions) {
+    private void throwUnmetException(Set<Class<?>> currentDefinitions) {
         String unmet = currentDefinitions.stream()
                 .map(Class::getName)
                 .collect(Collectors.joining(", "));
