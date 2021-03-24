@@ -104,18 +104,15 @@ public class Container {
     }
 
     private void declarationInterfaces(Map<? extends Class<?>, Object> generation) {
-        generation.entrySet().stream()
-                .map(o -> {
-                    final var interfaces = o.getKey().getInterfaces();
-                    final var value = o.getValue();
-                    final var ifaces = new HashMap<Class<?>, Object>();
-                    for (Class<?> cls : interfaces) {
-                        ifaces.computeIfAbsent(cls, k -> {
-                            throw new MultipleInterfaceImplementationException(String.format("%s have multiple implementation", cls.getName()));
-                        });
-                        ifaces.put(cls, value);
-                    }
-                    return ifaces;
-                }).forEach(objects::putAll);
+        generation.forEach((key, value) -> {
+            final var interfaces = key.getInterfaces();
+            for (Class<?> cls : interfaces) {
+                if (objects.containsKey(cls)) {
+                    throw new MultipleInterfaceImplementationException(String.format("%s have multiple implementation", cls.getName()));
+                }
+
+                objects.put(cls, value);
+            }
+        });
     }
 }
