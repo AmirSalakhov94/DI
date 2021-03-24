@@ -41,16 +41,15 @@ public class Container {
             return;
         }
 
-        generation(currentDefinitions, true);
         while (!currentDefinitions.isEmpty()) {
-            generation(currentDefinitions, false);
+            generation(currentDefinitions);
         }
     }
 
-    private void generation(Set<Class<?>> currentDefinitions, boolean firstIterator) {
+    private void generation(Set<Class<?>> currentDefinitions) {
         Map<? extends Class<?>, Object> generation = currentDefinitions.stream()
                 .map(o -> o.getDeclaredConstructors()[0])
-                .filter(o -> firstIterator ? (o.getParameterCount() == 0 || allParameterInValues(o)) : allParameterInValues(o))
+                .filter(o -> o.getParameterCount() == 0 || allParameterInValues(o))
                 .map(this::createInstance)
                 .collect(Collectors.toMap(Object::getClass, Function.identity()));
 
