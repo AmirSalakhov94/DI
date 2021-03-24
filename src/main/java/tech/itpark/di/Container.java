@@ -87,16 +87,10 @@ public class Container {
     }
 
     private boolean allParameterInValues(Constructor<?> constructor) {
-        final var parameters = new HashSet<>(Arrays.asList(constructor.getParameters()));
-        parameters.removeIf(p -> objects.containsKey(p.getType()));
-        parameters.removeAll(
-                parameters.stream()
-                        .filter(p -> p.isAnnotationPresent(Inject.class))
-                        .filter(p -> values.containsKey(p.getAnnotation(Inject.class).value()))
-                        .collect(Collectors.toList())
-        );
-
-        return parameters.isEmpty();
+        return Arrays.stream(constructor.getParameters())
+                .allMatch(p -> objects.containsKey(p.getType())
+                        || (p.isAnnotationPresent(Inject.class)
+                        && values.containsKey(p.getAnnotation(Inject.class).value())));
     }
 
     private Object[] getParamsValue(Constructor<?> constructor) {
