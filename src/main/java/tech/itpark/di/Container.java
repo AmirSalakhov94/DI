@@ -16,7 +16,7 @@ public class Container {
     private final Set<Class<?>> definitions = new HashSet<>();
 
     public void register(Class<?>... definitions) {
-        String badDefinitions = Arrays.stream(definitions)
+        final String badDefinitions = Arrays.stream(definitions)
                 .filter(o -> o.getDeclaredConstructors().length != 1)
                 .map(Class::getName)
                 .collect(Collectors.joining(", "));
@@ -47,7 +47,7 @@ public class Container {
     }
 
     private void generation(Set<Class<?>> currentDefinitions) {
-        Map<? extends Class<?>, Object> generation = currentDefinitions.stream()
+        final var generation = currentDefinitions.stream()
                 .map(o -> o.getDeclaredConstructors()[0])
                 .filter(o -> o.getParameterCount() == 0 || allParameterInValues(o))
                 .map(this::createInstance)
@@ -63,10 +63,10 @@ public class Container {
     }
 
     private Object createInstance(Constructor<?> constructor) {
-        boolean isAccess = constructor.canAccess(null);
+        final boolean isAccess = constructor.canAccess(null);
         try {
             constructor.setAccessible(true);
-            Object[] params = getParamsValue(constructor);
+            final Object[] params = getParamsValue(constructor);
             return constructor.newInstance(params);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
@@ -79,7 +79,7 @@ public class Container {
     }
 
     private void throwUnmetException(Set<Class<?>> currentDefinitions) {
-        String unmet = currentDefinitions.stream()
+        final String unmet = currentDefinitions.stream()
                 .map(Class::getName)
                 .collect(Collectors.joining(", "));
 
