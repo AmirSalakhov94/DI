@@ -36,7 +36,7 @@ public class Container {
     }
 
     public void wire() {
-        HashSet<Class<?>> currentDefinitions = new HashSet<>(definitions);
+        final var currentDefinitions = new HashSet<>(definitions);
         if (currentDefinitions.isEmpty()) {
             return;
         }
