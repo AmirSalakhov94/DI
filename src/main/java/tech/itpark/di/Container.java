@@ -104,15 +104,14 @@ public class Container {
     }
 
     private void declarationInterfaces(Map<? extends Class<?>, Object> generation) {
-        generation.forEach((key, value) -> {
-            final var interfaces = key.getInterfaces();
-            for (Class<?> cls : interfaces) {
-                if (objects.containsKey(cls)) {
-                    throw new MultipleInterfaceImplementationException(String.format("%s have multiple implementation", cls.getName()));
-                }
-
-                objects.put(cls, value);
-            }
-        });
+        generation.keySet()
+                .forEach(key -> Arrays.stream(key.getInterfaces())
+                        .peek(cls -> {
+                            if (objects.containsKey(cls)) {
+                                throw new MultipleInterfaceImplementationException(String
+                                        .format("%s have multiple implementation", cls.getName()));
+                            }
+                        })
+                       .forEach(cls -> objects.put(cls, generation.get(key))));
     }
 }
